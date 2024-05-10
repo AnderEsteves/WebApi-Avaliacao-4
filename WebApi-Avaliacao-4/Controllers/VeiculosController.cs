@@ -32,16 +32,24 @@ namespace WebApi_Avaliacao_4.Controllers
         }
 
 
-
-
-
-
-
         // GET: api/Veiculos/5
-        public string Get(int id)
+        public IHttpActionResult Get(int id)
         {
-            return "value";
+
+            Models.Veiculo veiculo = repoVeiculos.Select(id);
+
+            if(veiculo is null)
+                return NotFound();  
+
+
+            return Ok(veiculo);
+
         }
+
+
+
+
+
 
         // POST: api/Veiculos
         public void Post([FromBody]string value)

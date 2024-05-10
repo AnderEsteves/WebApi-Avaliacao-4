@@ -10,7 +10,7 @@ namespace WebApi_Avaliacao_4.Configuration
         public static string GetConnectionString()
         {
 
-            return System.Configuration.ConfigurationManager.ConnectionStrings["veiculos"].ConnectionString;
+            return System.Configuration.ConfigurationManager.ConnectionStrings["veiculos2"].ConnectionString;
 
         }
     }
