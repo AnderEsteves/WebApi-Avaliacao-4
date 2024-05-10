@@ -20,7 +20,7 @@ namespace WebApi_Avaliacao_4.Models
         public int AnoModelo { get; set; }
 
         [Required]
-        public DateTime AnoFabricacao { get; set; }
+        public DateTime DataFabricacao { get; set; }
 
         [Required]
         public decimal Valor { get; set; }
