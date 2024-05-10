@@ -25,6 +25,6 @@ namespace WebApi_Avaliacao_4.Models
         [Required]
         public decimal Valor { get; set; }
 
-        public string Opicionais { get; set; }
+        public string Opcionais { get; set; }
     }
 }

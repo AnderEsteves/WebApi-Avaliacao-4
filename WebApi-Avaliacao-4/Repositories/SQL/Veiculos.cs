@@ -44,7 +44,7 @@ namespace WebApi_Avaliacao_4.Repositories.SQL
                             veiculo.AnoModelo = (int) dr["AnoModelo"];
                             veiculo.DataFabricacao = (DateTime) dr["DataFabricacao"];
                             veiculo.Valor = (decimal)dr["Valor"];
-                            veiculo.Opicionais = dr["Opcionais"].ToString();
+                            veiculo.Opcionais = dr["Opcionais"].ToString();
 
                             veiculos.Add(veiculo);
                         }
@@ -82,7 +82,7 @@ namespace WebApi_Avaliacao_4.Repositories.SQL
                             veiculo.AnoModelo = (int)dr["AnoModelo"];
                             veiculo.DataFabricacao = (DateTime)dr["DataFabricacao"];
                             veiculo.Valor = (decimal)dr["Valor"];
-                            veiculo.Opicionais = dr["Opcionais"].ToString();
+                            veiculo.Opcionais = dr["Opcionais"].ToString();
 
                         }
                     }
@@ -92,5 +92,49 @@ namespace WebApi_Avaliacao_4.Repositories.SQL
             return veiculo;
         }
 
+
+
+        public List<Models.Veiculo> Select(string nome)
+        {
+            List<Models.Veiculo> veiculos = new List<Models.Veiculo>();
+
+            using (this.conn)
+            {
+                this.conn.Open();
+
+                using (this.cmd)
+                {
+                    cmd.CommandText = "select Id, Marca, Nome, AnoModelo, DataFabricacao, Valor, Opcionais from veiculos where nome like @Nome;";
+                    cmd.Parameters.Add(new SqlParameter("@nome", System.Data.SqlDbType.VarChar)).Value = $"%{nome}%"; ;
+
+                    using (SqlDataReader dr = this.cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            Models.Veiculo veiculo = new Models.Veiculo();
+
+                            veiculo.Id = (int)dr["Id"];
+                            veiculo.Marca = dr["Marca"].ToString();
+                            veiculo.Nome = dr["Nome"].ToString();
+                            veiculo.AnoModelo = (int)dr["AnoModelo"];
+                            veiculo.DataFabricacao = (DateTime)dr["DataFabricacao"];
+                            veiculo.Valor = (decimal)dr["Valor"];
+                            veiculo.Opcionais = dr["Opcionais"].ToString();
+
+                            veiculos.Add(veiculo);
+
+                        }
+                    }
+                }
+            }
+
+            return veiculos;
+        }
     }
+
+
+
+    
+
 }
+

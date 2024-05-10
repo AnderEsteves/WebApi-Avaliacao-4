@@ -46,7 +46,13 @@ namespace WebApi_Avaliacao_4.Controllers
 
         }
 
+        // GET: api/Veiculos?nome=
+        public IHttpActionResult Get(string nome)
+        {
 
+            return Ok(repoVeiculos.Select(nome));
+
+        }
 
 
 
@@ -54,6 +60,8 @@ namespace WebApi_Avaliacao_4.Controllers
         // POST: api/Veiculos
         public void Post([FromBody]string value)
         {
+
+
         }
 
         // PUT: api/Veiculos/5
