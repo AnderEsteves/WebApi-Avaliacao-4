@@ -5,6 +5,10 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using WebApi_Avaliacao_4.Configuration;
+using System.IO;
+
+using System.Configuration;
+
 
 namespace WebApi_Avaliacao_4.Controllers
 {
@@ -24,33 +28,67 @@ namespace WebApi_Avaliacao_4.Controllers
 
         // GET: api/Veiculos
         public IHttpActionResult Get()
-        
         {
-            return Ok(repoVeiculos.Select());
+           
+            try
+            {
+                return Ok(repoVeiculos.Select());
+            }
+            catch (Exception e)
+            {
+                Utils.Logger.WriteExpection(Logger.GetFullPath(), e);
+                return InternalServerError();
+            }
+        }
+
+     
+
+
+
+// GET: api/Veiculos/5
+public IHttpActionResult Get(int id)
+        {
+
+            try
+            {
+                Models.Veiculo veiculo = repoVeiculos.Select(id);
+
+                if (veiculo is null)
+                    return NotFound();
+
+
+                return Ok(veiculo);
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
         }
 
 
-        // GET: api/Veiculos/5
-        public IHttpActionResult Get(int id)
-        {
-
-            Models.Veiculo veiculo = repoVeiculos.Select(id);
-
-            if(veiculo is null)
-                return NotFound();  
 
 
-            return Ok(veiculo);
-
-        }
 
         // GET: api/Veiculos?nome=
         public IHttpActionResult Get(string nome)
         {
 
-            return Ok(repoVeiculos.Select(nome));
+            try
+            {
+                return Ok(repoVeiculos.Select(nome));
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
 
         }
+
 
 
 
@@ -59,14 +97,27 @@ namespace WebApi_Avaliacao_4.Controllers
         public IHttpActionResult Post([FromBody] Models.Veiculo veiculo)
         {
 
-          if(!repoVeiculos.Insert(veiculo))
+
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
+
+                if (!repoVeiculos.Insert(veiculo))
+                    return InternalServerError();
+
+
+                return Ok();
+
+            }
+            catch (Exception e)
+            {
+                Utils.Logger.WriteExpection(Logger.GetFullPath(), e);
                 return InternalServerError();
-
-
-            return Ok();
+            }
 
         }
-
 
 
 
@@ -75,19 +126,34 @@ namespace WebApi_Avaliacao_4.Controllers
         // PUT: api/Veiculos/5
         public IHttpActionResult Put(int id, [FromBody] Models.Veiculo veiculo)
         {
-            
-            if(id != veiculo.Id)
-                return BadRequest("id da requisição é diferente do id do body");
+
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
 
 
-
-            bool returnBank = repoVeiculos.Update(veiculo);
-
-            if(!returnBank)
-                return NotFound();
+                if (id != veiculo.Id)
+                    return BadRequest("id da requisição é diferente do id do body");
 
 
-            return Ok();
+                bool returnBank = repoVeiculos.Update(veiculo);
+
+                if (!returnBank)
+                    return NotFound();
+
+                
+                return Ok();
+
+            }
+            catch (Exception e)
+            {
+
+                Utils.Logger.WriteExpection(Logger.GetFullPath(), e);
+                return InternalServerError();
+
+            }
+
         }
 
 
@@ -98,12 +164,22 @@ namespace WebApi_Avaliacao_4.Controllers
         public IHttpActionResult Delete(int id)
         {
 
-            bool returnBank = repoVeiculos.Delete(id);
+        
+            try
+            {
+                bool returnBank = repoVeiculos.Delete(id);
 
-            if(!returnBank)
-                return NotFound();
+                if (!returnBank)
+                    return NotFound();
 
-            return Ok();
+                return Ok();
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
 
         }
     }

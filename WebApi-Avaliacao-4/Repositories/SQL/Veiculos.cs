@@ -177,7 +177,7 @@ namespace WebApi_Avaliacao_4.Repositories.SQL
                 {
                     cmd.CommandText = "update veiculos set marca=@marca, nome=@nome, anomodelo=@anomodelo, dataFabricacao=@datafabricacao, valor=@valor, opcionais=@opcionais where id = @id ";
 
-                    cmd.Parameters.Add(new SqlParameter("@marca", System.Data.SqlDbType.VarChar)).Value = veiculo.Marca;
+                    cmd.Parameters.Add(new SqlParameter("@marc", System.Data.SqlDbType.VarChar)).Value = veiculo.Marca;
                     cmd.Parameters.Add(new SqlParameter("@nome", System.Data.SqlDbType.VarChar)).Value = veiculo.Nome;
                     cmd.Parameters.Add(new SqlParameter("@anomodelo", System.Data.SqlDbType.Int)).Value = veiculo.AnoModelo;
                     cmd.Parameters.Add(new SqlParameter("@datafabricacao", System.Data.SqlDbType.DateTime)).Value = veiculo.DataFabricacao;
