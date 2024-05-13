@@ -19,9 +19,7 @@ namespace WebApi_Avaliacao_4.Controllers
 
         }
 
-        
-
-
+       
 
 
         // GET: api/Veiculos
@@ -58,11 +56,21 @@ namespace WebApi_Avaliacao_4.Controllers
 
 
         // POST: api/Veiculos
-        public void Post([FromBody]string value)
+        public IHttpActionResult Post([FromBody] Models.Veiculo veiculo)
         {
 
+          if(!repoVeiculos.Insert(veiculo))
+                return InternalServerError();
+
+
+            return Ok();
 
         }
+
+
+
+
+
 
         // PUT: api/Veiculos/5
         public void Put(int id, [FromBody]string value)
