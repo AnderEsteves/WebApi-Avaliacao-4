@@ -162,6 +162,37 @@ namespace WebApi_Avaliacao_4.Repositories.SQL
 
             return veiculo.Id != 0;
         }
+
+
+        public bool Update(Models.Veiculo veiculo)
+        {
+
+            int linhasAfetadas = 0;
+
+            using (this.conn)
+            {
+                this.conn.Open();
+
+                using (this.cmd)
+                {
+                    cmd.CommandText = "update veiculos set marca=@marca, nome=@nome, anomodelo=@anomodelo, dataFabricacao=@datafabricacao, valor=@valor, opcionais=@opcionais where id = @id ";
+
+                    cmd.Parameters.Add(new SqlParameter("@marca", System.Data.SqlDbType.VarChar)).Value = veiculo.Marca;
+                    cmd.Parameters.Add(new SqlParameter("@nome", System.Data.SqlDbType.VarChar)).Value = veiculo.Nome;
+                    cmd.Parameters.Add(new SqlParameter("@anomodelo", System.Data.SqlDbType.Int)).Value = veiculo.AnoModelo;
+                    cmd.Parameters.Add(new SqlParameter("@datafabricacao", System.Data.SqlDbType.DateTime)).Value = veiculo.DataFabricacao;
+                    cmd.Parameters.Add(new SqlParameter("@valor", System.Data.SqlDbType.Decimal)).Value = veiculo.Valor;
+                    cmd.Parameters.Add(new SqlParameter("@opcionais", System.Data.SqlDbType.VarChar)).Value = veiculo.Opcionais;
+                    cmd.Parameters.Add(new SqlParameter("@id", System.Data.SqlDbType.Int)).Value = veiculo.Id; 
+
+                    linhasAfetadas = (int) cmd.ExecuteNonQuery();
+                }
+            }
+
+            return linhasAfetadas != 0;
+
+        }
+
     }
 
 

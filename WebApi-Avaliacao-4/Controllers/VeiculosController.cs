@@ -73,9 +73,26 @@ namespace WebApi_Avaliacao_4.Controllers
 
 
         // PUT: api/Veiculos/5
-        public void Put(int id, [FromBody]string value)
+        public IHttpActionResult Put(int id, [FromBody] Models.Veiculo veiculo)
         {
+            
+            if(id != veiculo.Id)
+                return BadRequest("id da requisição é diferente do id do body");
+
+
+
+            bool returnBank = repoVeiculos.Update(veiculo);
+
+            if(!returnBank)
+                return NotFound();
+
+
+            return Ok();
         }
+
+
+
+
 
         // DELETE: api/Veiculos/5
         public void Delete(int id)
