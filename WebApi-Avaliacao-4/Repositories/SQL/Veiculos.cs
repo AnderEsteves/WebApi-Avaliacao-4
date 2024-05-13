@@ -163,7 +163,7 @@ namespace WebApi_Avaliacao_4.Repositories.SQL
             return veiculo.Id != 0;
         }
 
-
+        [HttpPut]
         public bool Update(Models.Veiculo veiculo)
         {
 
@@ -193,6 +193,30 @@ namespace WebApi_Avaliacao_4.Repositories.SQL
 
         }
 
+
+        [HttpDelete]
+        public bool Delete(int id)
+        {
+
+            int linhasAfetadas = 0;
+
+            using (this.conn)
+            {
+
+                 this.conn.Open();
+
+                using (this.cmd)
+                {
+                    cmd.CommandText = "delete veiculos where id = @id;";
+                    cmd.Parameters.Add(new SqlParameter("@id", System.Data.SqlDbType.Int)).Value = id;
+
+                    linhasAfetadas = (int) cmd.ExecuteNonQuery();
+                }
+            }
+
+            return linhasAfetadas == 1;
+
+        }
     }
 
 

@@ -95,8 +95,16 @@ namespace WebApi_Avaliacao_4.Controllers
 
 
         // DELETE: api/Veiculos/5
-        public void Delete(int id)
+        public IHttpActionResult Delete(int id)
         {
+
+            bool returnBank = repoVeiculos.Delete(id);
+
+            if(!returnBank)
+                return NotFound();
+
+            return Ok();
+
         }
     }
 }
