@@ -8,6 +8,7 @@ using WebApi_Avaliacao_4.Configuration;
 using System.IO;
 
 using System.Configuration;
+using System.Threading.Tasks;
 
 
 namespace WebApi_Avaliacao_4.Controllers
@@ -27,12 +28,12 @@ namespace WebApi_Avaliacao_4.Controllers
 
 
         // GET: api/Veiculos
-        public IHttpActionResult Get()
+        public async Task<IHttpActionResult> Get()
         {
-           
+
             try
             {
-                return Ok(repoVeiculos.Select());
+                return Ok(await repoVeiculos.Select());
             }
             catch (Exception e)
             {
@@ -44,14 +45,14 @@ namespace WebApi_Avaliacao_4.Controllers
      
 
 
-
-// GET: api/Veiculos/5
-public IHttpActionResult Get(int id)
+    
+        // GET: api/Veiculos/5  
+        public async Task<IHttpActionResult> Get(int id)
         {
 
             try
             {
-                Models.Veiculo veiculo = repoVeiculos.Select(id);
+                Models.Veiculo veiculo = await repoVeiculos.Select(id);
 
                 if (veiculo is null)
                     return NotFound();
@@ -60,10 +61,10 @@ public IHttpActionResult Get(int id)
                 return Ok(veiculo);
 
             }
-            catch (Exception)
+            catch (Exception e)
             {
-
-                throw;
+                Utils.Logger.WriteExpection(Logger.GetFullPath(), e);
+                return InternalServerError();
             }
 
         }
@@ -73,18 +74,17 @@ public IHttpActionResult Get(int id)
 
 
         // GET: api/Veiculos?nome=
-        public IHttpActionResult Get(string nome)
+        public async Task<IHttpActionResult> Get(string nome)
         {
 
             try
             {
-                return Ok(repoVeiculos.Select(nome));
-
+                return Ok(await repoVeiculos.Select(nome));
             }
-            catch (Exception)
+            catch (Exception e)
             {
-
-                throw;
+                Utils.Logger.WriteExpection(Logger.GetFullPath(), e);
+                return InternalServerError();
             }
 
         }
@@ -94,19 +94,16 @@ public IHttpActionResult Get(int id)
 
 
         // POST: api/Veiculos
-        public IHttpActionResult Post([FromBody] Models.Veiculo veiculo)
+        public async Task<IHttpActionResult> Post([FromBody] Models.Veiculo veiculo)
         {
 
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             try
             {
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
-
-
-                if (!repoVeiculos.Insert(veiculo))
+                if (!await repoVeiculos.Insert(veiculo))
                     return InternalServerError();
-
 
                 return Ok();
 
@@ -124,25 +121,23 @@ public IHttpActionResult Get(int id)
 
 
         // PUT: api/Veiculos/5
-        public IHttpActionResult Put(int id, [FromBody] Models.Veiculo veiculo)
+        public async Task<IHttpActionResult> Put(int id, [FromBody] Models.Veiculo veiculo)
         {
+
+            if (id != veiculo.Id)
+                return BadRequest("id da requisição é diferente do id do body");
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             try
             {
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
 
+                bool returnDB = await repoVeiculos.Update(veiculo);
 
-                if (id != veiculo.Id)
-                    return BadRequest("id da requisição é diferente do id do body");
-
-
-                bool returnBank = repoVeiculos.Update(veiculo);
-
-                if (!returnBank)
+                if (!returnDB)
                     return NotFound();
 
-                
                 return Ok();
 
             }
@@ -161,24 +156,26 @@ public IHttpActionResult Get(int id)
 
 
         // DELETE: api/Veiculos/5
-        public IHttpActionResult Delete(int id)
+        public async Task<IHttpActionResult> Delete(int id)
         {
 
         
             try
             {
-                bool returnBank = repoVeiculos.Delete(id);
+                bool returnDB = await repoVeiculos.Delete(id);
 
-                if (!returnBank)
+                if (!returnDB)
                     return NotFound();
 
                 return Ok();
 
             }
-            catch (Exception)
+            catch (Exception e) 
             {
 
-                throw;
+
+                Utils.Logger.WriteExpection(Logger.GetFullPath(), e);
+                return InternalServerError();
             }
 
         }

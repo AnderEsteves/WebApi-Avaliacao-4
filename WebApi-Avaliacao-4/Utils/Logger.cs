@@ -12,14 +12,15 @@ namespace WebApi_Avaliacao_4.Utils
         public static void WriteExpection(string fullPatch, Exception e)
         {
 
-            using (StreamWriter sw = new StreamWriter(, true))
+            using (StreamWriter sw = new StreamWriter(fullPatch, true))
             {
-                sw.WriteLine("Data: ");
+                sw.Write("Data: ");
                 sw.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-                sw.WriteLine("Mensagem");
+                sw.Write("Mensagem:");
                 sw.Write(e.Message);
-                sw.Write("StackTrace");
+                sw.WriteLine("StackTrace:");
                 sw.Write(e.StackTrace);
+                sw.WriteLine("\n\n");
             }
 
         }

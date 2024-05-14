@@ -16,7 +16,7 @@ namespace WebApi_Avaliacao_4.Configuration
 
         private static string GetArchiveName()
         {
-            return $"{DateTime.Now.ToString("yyyy-MM-dd")}.txt";
+            return $"{DateTime.Now.ToString("yyyy-MM-dd")} - Log.txt";
         }
 
 

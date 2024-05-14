@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using WebApi_Avaliacao_4.Models;
@@ -22,21 +23,21 @@ namespace WebApi_Avaliacao_4.Repositories.SQL
 
 
         [HttpGet]
-        public List<Models.Veiculo> Select()
+        public async Task<List<Models.Veiculo>> Select()
         {
             List<Models.Veiculo> veiculos = new List<Models.Veiculo>();
 
             using (this.conn)
             {
-                this.conn.Open();
+                await this.conn.OpenAsync();
 
                 using (this.cmd)
                 {
                     cmd.CommandText = "select Id, Marca, Nome, AnoModelo, DataFabricacao, Valor, Opcionais from veiculos;";
 
-                    using (SqlDataReader dr = this.cmd.ExecuteReader())
+                    using (SqlDataReader dr = await this.cmd.ExecuteReaderAsync())
                     {
-                        while (dr.Read())
+                        while (await dr.ReadAsync())
                         {
                             Models.Veiculo veiculo = new Models.Veiculo();
 
@@ -46,36 +47,39 @@ namespace WebApi_Avaliacao_4.Repositories.SQL
                             veiculo.AnoModelo = (int) dr["AnoModelo"];
                             veiculo.DataFabricacao = (DateTime) dr["DataFabricacao"];
                             veiculo.Valor = (decimal)dr["Valor"];
-                            veiculo.Opcionais = dr["Opcionais"].ToString();
+
+                            if (dr["Opcionais"] != DBNull.Value)
+                                veiculo.Opcionais = dr["Opcionais"].ToString();
+
+
 
                             veiculos.Add(veiculo);
                         }
                     }
                 }
             }
-
             return veiculos;
         }
 
 
 
         [HttpGet]
-        public Models.Veiculo Select(int id)
+        public async Task<Models.Veiculo> Select(int id)
         {
             Models.Veiculo veiculo = null;
 
             using (this.conn)
             {
-                this.conn.Open();
+                await this.conn.OpenAsync();
 
                 using (this.cmd)
                 {
                     cmd.CommandText = "select Id, Marca, Nome, AnoModelo, DataFabricacao, Valor, Opcionais from veiculos where Id = @id;";
                     cmd.Parameters.Add(new SqlParameter("@id", System.Data.SqlDbType.Int)).Value = id;
 
-                    using (SqlDataReader dr = this.cmd.ExecuteReader())
+                    using (SqlDataReader dr = await this.cmd.ExecuteReaderAsync())
                     {
-                        if (dr.Read())
+                        if (await dr.ReadAsync())
                         {
                             veiculo = new Models.Veiculo();
 
@@ -85,34 +89,35 @@ namespace WebApi_Avaliacao_4.Repositories.SQL
                             veiculo.AnoModelo = (int)dr["AnoModelo"];
                             veiculo.DataFabricacao = (DateTime)dr["DataFabricacao"];
                             veiculo.Valor = (decimal)dr["Valor"];
-                            veiculo.Opcionais = dr["Opcionais"].ToString();
+
+                            if (dr["Opcionais"] != DBNull.Value)
+                                veiculo.Opcionais = dr["Opcionais"].ToString();
 
                         }
                     }
                 }
             }
-
             return veiculo;
         }
 
 
         [HttpGet]
-        public List<Models.Veiculo> Select(string nome)
+        public async Task<List<Models.Veiculo>> Select(string nome)
         {
             List<Models.Veiculo> veiculos = new List<Models.Veiculo>();
 
             using (this.conn)
             {
-                this.conn.Open();
+                await this.conn.OpenAsync();
 
                 using (this.cmd)
                 {
                     cmd.CommandText = "select Id, Marca, Nome, AnoModelo, DataFabricacao, Valor, Opcionais from veiculos where nome like @Nome;";
                     cmd.Parameters.Add(new SqlParameter("@nome", System.Data.SqlDbType.VarChar)).Value = $"%{nome}%"; 
 
-                    using (SqlDataReader dr = this.cmd.ExecuteReader())
+                    using (SqlDataReader dr = await this.cmd.ExecuteReaderAsync())
                     {
-                        while (dr.Read())
+                        while (await dr.ReadAsync())
                         {
                             Models.Veiculo veiculo = new Models.Veiculo();
 
@@ -122,7 +127,10 @@ namespace WebApi_Avaliacao_4.Repositories.SQL
                             veiculo.AnoModelo = (int)dr["AnoModelo"];
                             veiculo.DataFabricacao = (DateTime)dr["DataFabricacao"];
                             veiculo.Valor = (decimal)dr["Valor"];
-                            veiculo.Opcionais = dr["Opcionais"].ToString();
+
+                            if (dr["Opcionais"] != DBNull.Value)
+                                veiculo.Opcionais = dr["Opcionais"].ToString();
+
 
                             veiculos.Add(veiculo);
 
@@ -130,19 +138,18 @@ namespace WebApi_Avaliacao_4.Repositories.SQL
                     }
                 }
             }
-
             return veiculos;
         }
 
 
 
         [HttpPost]
-        public bool Insert(Models.Veiculo veiculo)
+        public async Task<bool> Insert(Models.Veiculo veiculo)
         {
 
             using (this.conn)
             {
-                this.conn.Open();
+               await this.conn.OpenAsync();
 
                 using (this.cmd)
                 {
@@ -152,50 +159,57 @@ namespace WebApi_Avaliacao_4.Repositories.SQL
                     cmd.Parameters.Add(new SqlParameter("@anomodelo", System.Data.SqlDbType.Int)).Value = veiculo.AnoModelo;
                     cmd.Parameters.Add(new SqlParameter("@datafabricacao", System.Data.SqlDbType.DateTime)).Value = veiculo.DataFabricacao;
                     cmd.Parameters.Add(new SqlParameter("@valor", System.Data.SqlDbType.Decimal)).Value = veiculo.Valor;
-                    cmd.Parameters.Add(new SqlParameter("@opcionais", System.Data.SqlDbType.VarChar)).Value = veiculo.Opcionais;
 
-                   veiculo.Id =(int) cmd.ExecuteScalar();
+                    if (veiculo.Opcionais is null)
+                        cmd.Parameters.Add(new SqlParameter("@opcionais", System.Data.SqlDbType.VarChar)).Value = DBNull.Value;
+                    else
+                        cmd.Parameters.Add(new SqlParameter("@opcionais", System.Data.SqlDbType.VarChar)).Value = veiculo.Opcionais;
+
+                    veiculo.Id =(int) await cmd.ExecuteScalarAsync();
 
                 }
             }
 
-
             return veiculo.Id != 0;
         }
 
-        [HttpPut]
-        public bool Update(Models.Veiculo veiculo)
-        {
 
+        [HttpPut]
+        public async Task<bool> Update(Models.Veiculo veiculo)
+        {
             int linhasAfetadas = 0;
 
             using (this.conn)
             {
-                this.conn.Open();
+                await this.conn.OpenAsync();
 
                 using (this.cmd)
                 {
                     cmd.CommandText = "update veiculos set marca=@marca, nome=@nome, anomodelo=@anomodelo, dataFabricacao=@datafabricacao, valor=@valor, opcionais=@opcionais where id = @id ";
 
-                    cmd.Parameters.Add(new SqlParameter("@marc", System.Data.SqlDbType.VarChar)).Value = veiculo.Marca;
+                    cmd.Parameters.Add(new SqlParameter("@marca", System.Data.SqlDbType.VarChar)).Value = veiculo.Marca;
                     cmd.Parameters.Add(new SqlParameter("@nome", System.Data.SqlDbType.VarChar)).Value = veiculo.Nome;
                     cmd.Parameters.Add(new SqlParameter("@anomodelo", System.Data.SqlDbType.Int)).Value = veiculo.AnoModelo;
                     cmd.Parameters.Add(new SqlParameter("@datafabricacao", System.Data.SqlDbType.DateTime)).Value = veiculo.DataFabricacao;
                     cmd.Parameters.Add(new SqlParameter("@valor", System.Data.SqlDbType.Decimal)).Value = veiculo.Valor;
-                    cmd.Parameters.Add(new SqlParameter("@opcionais", System.Data.SqlDbType.VarChar)).Value = veiculo.Opcionais;
-                    cmd.Parameters.Add(new SqlParameter("@id", System.Data.SqlDbType.Int)).Value = veiculo.Id; 
+                    cmd.Parameters.Add(new SqlParameter("@id", System.Data.SqlDbType.Int)).Value = veiculo.Id;
 
-                    linhasAfetadas = (int) cmd.ExecuteNonQuery();
+                    if(veiculo.Opcionais is null)
+                        cmd.Parameters.Add(new SqlParameter("@opcionais", System.Data.SqlDbType.VarChar)).Value = DBNull.Value;
+                    else
+                        cmd.Parameters.Add(new SqlParameter("@opcionais", System.Data.SqlDbType.VarChar)).Value = veiculo.Opcionais;
+
+                    linhasAfetadas = (int) await cmd.ExecuteNonQueryAsync();
                 }
             }
 
-            return linhasAfetadas != 0;
+            return linhasAfetadas == 1;
 
         }
 
 
         [HttpDelete]
-        public bool Delete(int id)
+        public async Task<bool> Delete(int id)
         {
 
             int linhasAfetadas = 0;
@@ -203,14 +217,14 @@ namespace WebApi_Avaliacao_4.Repositories.SQL
             using (this.conn)
             {
 
-                 this.conn.Open();
+                await this.conn.OpenAsync();
 
                 using (this.cmd)
                 {
                     cmd.CommandText = "delete veiculos where id = @id;";
                     cmd.Parameters.Add(new SqlParameter("@id", System.Data.SqlDbType.Int)).Value = id;
 
-                    linhasAfetadas = (int) cmd.ExecuteNonQuery();
+                    linhasAfetadas = (int) await cmd.ExecuteNonQueryAsync();
                 }
             }
 
